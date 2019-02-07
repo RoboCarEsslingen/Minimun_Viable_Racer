@@ -1,5 +1,5 @@
 # Minimun_Viable_Racer
-![Build Status](https://diyrobocars.com/wp-content/uploads/2017/10/IMG_20180421_223306-768x671.jpg =300x300)
+![Build Status](https://diyrobocars.com/wp-content/uploads/2017/10/IMG_20180421_223306-768x671.jpg)
 This repository describes the code, installation and shares some link to get that MVR up and running !
 In this project, we use opemv minimum viable racer configuration to successfully complete laps. Below is an expected outcome achieved using the provided code:
 [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/UrLFH2urBUM/0.jpg)](http://www.youtube.com/watch?v=UrLFH2urBUM)
