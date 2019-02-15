@@ -1,30 +1,42 @@
+###This is a script to follow white or yellow lane
+###Lane color must be selected in advance through by setting "Yellow" parameter
+###if False then lane is White, else Yellow
+
 ### Imports
 import sensor, pyb, math, time, mjpeg
 from pyb import LED,Pin,Timer
 
-### Parameters & constants
+### constants
 steering_direction = -1   # use this to revers the steering if your car goes in the wrong direction
 steering_gain = 1.7  # calibration for your car's steering sensitivity
 steering_center = 53  # set to your car servo's center point
 kp = 0.8   # P term of the PID
 ki = 0.0     # I term of the PID
 kd = 0.4    # D term of the PID
-thd = (240,255) #threshold for white lanes
+set_angle = 90 # this is the desired steering angle (straight ahead)
+radians_degrees = 57.3 # constant to convert from radians to degrees
+blue_led  = LED(3)
+
+### parameters
+Yellow=True
 MAG_THRESHOLD = 3 #magnitude of line in hough transform
+THD_WHITE=(240,255) #threshold for both yellow and white
+THD_YELLOW=(180,255)
+THD=THD_YELLOW if Yellow else THD_WHITE
 old_error = 0
 measured_angle = 0
-set_angle = 90 # this is the desired steering angle (straight ahead)
 p_term = 0
 i_term = 0
 d_term = 0
 old_time = pyb.millis()
-radians_degrees = 57.3 # constant to convert from radians to degrees
-blue_led  = LED(3)
 record_time=50000 #in ms
 cruise_speed = 30 # we dont change it
-roi_camera=(1,20,79,40) #bottom part of the field of view
-GRAYSCALE_THRESHOLDS = [(240, 255)] # White Line.
-GRAYSCALE_HIGH_LIGHT_THRESHOLDS = [(250, 255)]
+width=79
+height=30
+x_0=1
+y_0=10
+x_middle=40
+roi_camera=(x_0,y_0,width,height) #upper middle part of the field of view
 
 ####Helper functions
 #keeps "value" within "min" and "max"
@@ -47,10 +59,8 @@ def steer(angle):
     right = (90 + angle) * (cruise_speed/100)
     right = constrain (right, 0, 100)
     # Generate a 1KHz square wave on TIM4 with each channel
-    print('left angle: '+str(left)+' right angle: '+str(right))
     ch1.pulse_width_percent(left)
     ch2.pulse_width_percent(right)
-
 #updates car pid
 def update_pid():
     global old_time, old_error, measured_angle, set_angle
@@ -98,63 +108,41 @@ fname1="gs_"+str(pyb.millis())+".mjpeg"
 #m = mjpeg.Mjpeg(fname1)
 
 ### Init: Binary mask
-imbin = sensor.alloc_extra_fb(sensor.width(), sensor.height(), sensor.GRAYSCALE)
-imbin.replace(sensor.snapshot())
-imbin.clear()
-imbin.draw_rectangle(roi_camera[0],roi_camera[1],roi_camera[2],roi_camera[3],fill=True)
 
 start = pyb.millis()
-#while(pyb.elapsed_millis(start) < record_time):
 deflection_angle=0
+a=0.5*sensor.width()
+lane_center=a
+#while(pyb.elapsed_millis(start) < record_time):
 while(True):
-
     clock.tick()
     ######1. Perception
-    #img = sensor.snapshot().histeq()
-    #img = sensor.snapshot()
     img = sensor.snapshot().histeq()
-    img.binary([thd])
+    img.binary([(180,255)])
     img.erode(1)
-    #img.binary([thd],mask=imbin)
-    #img.binary(GRAYSCALE_HIGH_LIGHT_THRESHOLDS, zero = True)
-    #img.histeq()
-    #img.binary(GRAYSCALE_THRESHOLDS)
-    #img.erode(1, threshold = 5).dilate(1, threshold = 1)
-
-    #img.erode(1)
     line = img.get_regression([(255,255)],roi=roi_camera, robust=True)
     img.draw_rectangle(roi_camera[0],roi_camera[1],roi_camera[2],roi_camera[3])
     ######2. Localization
-    #deflection_angle = 0
-    txt="no entry"
     if line and (line.magnitude() >= MAG_THRESHOLD):
-        txt="entry"
         img.draw_line(line.line(), color=127)
-        lane_center=40
-        if abs(line.x1()-line.x2())<5:
-            lane_center=int((line.x1()+line.x2())/2)
-        elif abs(line.y1()-line.y2())<5:
-            lane_center=100
-        else:
-            a=(line.y2()-line.y1())/(line.x2()-line.x1())
-            b_1=line.y1()-a*line.x1()
-            b_2=line.y2()-a*line.x2()
-            b=(b_1+b_2)/2
-            lane_center=(20-b)/a
-        img.draw_cross(int(lane_center),20,255)
+        b=line.x1()
+        if line.y2()< line.y1():b=line.x2()
+        #if abs(line.x1()-line.x2())<5:
+            #lane_center=int((line.x1()+line.x2())/2)
+        lane_center=0.5*b+0.5*a
+        a=b
+        img.draw_cross(int(lane_center),y_0,127)
     ######3. Trajectory generation
-        deflection_angle = -math.atan((lane_center-40)/40)
-        deflection_angle = math.degrees(deflection_angle)
-    #deflection_angle=50
-    #print(txt+" angle: "+str(deflection_angle))
-    #m.add_frame(img)
+        deflection_angle = -math.atan((lane_center-0.5*sensor.width())/(sensor.height()-y_0))
+        deflection_angle = math.degrees(deflection_angle) #heading in degrees
     ######4. Control
     now = pyb.millis()
     if  now > old_time + 0.02 :  # time has passed since last measurement; do the PID at 50hz
         blue_led.on()
         measured_angle = deflection_angle + 90
         steer_angle = update_pid()
-        img.draw_string(5,5,str(round(steer_angle,2)),mono_space=False)
+        txt=str(round(deflection_angle,2))
+        img.draw_string(5,5,txt,scale=1,mono_space=False,color=127)
         old_time = now
         steer(steer_angle)
         blue_led.off()

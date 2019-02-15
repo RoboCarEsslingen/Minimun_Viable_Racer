@@ -16,6 +16,6 @@ https://diyrobocars.com/2017/10/01/a-minimum-viable-racer-for-openmv/
 4. Make sure to have some white tape and black paper.
 ### Run the car
 1. `git clone https://github.com/RoboCarEsslingen/Minimun_Viable_Racer`
-2. In openmvide open `mains/grayscale.py` 
+2. In openmvide open `mains/lane_follow.py` 
 3. Connect the car to the ide and click Tools > Save open script to Openmv cam
 
