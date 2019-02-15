@@ -2,7 +2,7 @@
 ![Build Status](https://diyrobocars.com/wp-content/uploads/2017/10/IMG_20180421_223306-768x671.jpg)
 This repository describes the code, installation and shares some link to get that MVR up and running !
 In this project, we use opemv minimum viable racer configuration to successfully complete laps. Below is an expected outcome achieved using the provided code:
-![follow lane]](http://www.youtube.com/watch?v=UrLFH2urBUM)
+[![Follow lane](https://img.youtube.com/vi/UrLFH2urBUM/0.jpg)](http://www.youtube.com/watch?v=UrLFH2urBUM)
 
 ## Car mounting
 https://diyrobocars.com/2017/10/01/a-minimum-viable-racer-for-openmv/
