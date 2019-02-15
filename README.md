@@ -2,7 +2,7 @@
 ![Build Status](https://diyrobocars.com/wp-content/uploads/2017/10/IMG_20180421_223306-768x671.jpg)
 This repository describes the code, installation and shares some link to get that MVR up and running !
 In this project, we use opemv minimum viable racer configuration to successfully complete laps. Below is an expected outcome achieved using the provided code:
-[!IMAGE ALT TEXT HERE](http://img.youtube.com/vi/UrLFH2urBUM/0.jpg)](http://www.youtube.com/watch?v=UrLFH2urBUM)
+![follow lane]](http://www.youtube.com/watch?v=UrLFH2urBUM)
 
 ## Car mounting
 https://diyrobocars.com/2017/10/01/a-minimum-viable-racer-for-openmv/
@@ -19,7 +19,7 @@ https://diyrobocars.com/2017/10/01/a-minimum-viable-racer-for-openmv/
 ### Vehicle setup
 1. Before running the motor,make sure the camera is working properly by running `vehicle_setup/helloworld_1.py`
    You should expect to see a clear image similar to eye view.
-   [!test camera](https://github.com/RoboCarEsslingen/Minimun_Viable_Racer/blob/master/images/testing_camera.png)
+   ![test camera](https://github.com/RoboCarEsslingen/Minimun_Viable_Racer/blob/master/images/testing_camera.png)
    If the image is blurry, need to adjust focal distance by tweaking the camera gently.
 2. Make sure wheels spin properly by running `motor-shield-power-driver_1.py` Wheels should spin iteratively in both directions for 10 s.
    If not, then need to check: PINs, cable connections, battery, motor
